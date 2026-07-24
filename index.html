@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dave Zack | Data Scientist</title>
+  <meta property="og:title" content="Dave Zack | Data Scientist" />
+  <meta property="og:description" content="Sports analytics portfolio — football, basketball, baseball, hockey, and soccer." />
+  <meta property="og:image" content="https://dave-zack3.github.io/og-image.png" />
+  <meta property="og:url" content="https://dave-zack3.github.io" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://dave-zack3.github.io/og-image.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #0f172a;
+      --slate-bg:  #e2e8f0;
+      --blue:      #5b21b6;
+      --blue-dk:   #4c1d95;
+      --slate:   #64748b;
+      --text:    #1e293b;
+      --bg:      #f8fafc;
+      --white:   #ffffff;
+      --border:  #e2e8f0;
+      --radius:  12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(226, 232, 240, 0.97);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      padding: 0 2rem;
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 1.05rem;
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+    nav ul a {
+      color: #475569;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    nav ul a:hover { color: var(--navy); }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--slate-bg);
+      padding: 130px 2rem 90px;
+      text-align: center;
+    }
+    .hero h1 {
+      color: var(--navy);
+      font-size: clamp(2.4rem, 5.5vw, 3.75rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.4rem;
+    }
+    .hero-title {
+      color: var(--blue);
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.01em;
+    }
+    .hero-sub {
+      color: #475569;
+      font-size: 1rem;
+      max-width: 520px;
+      margin: 0 auto 2.25rem;
+      line-height: 1.75;
+    }
+    .hero-links {
+      display: flex;
+      gap: 0.85rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.18s;
+      border: 1.5px solid transparent;
+    }
+    .btn-primary { background: var(--blue); color: var(--white); }
+    .btn-primary:hover { background: var(--blue-dk); }
+    .btn-ghost { border-color: #94a3b8; color: #475569; }
+    .btn-ghost:hover { border-color: #64748b; color: var(--navy); }
+
+    /* ── SECTIONS ── */
+    section { padding: 80px 2rem; }
+    .inner { max-width: 1100px; margin: 0 auto; }
+    .sec-label {
+      font-size: 0.73rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 0.45rem;
+    }
+    .sec-title {
+      font-size: clamp(1.7rem, 3vw, 2.3rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--navy);
+      margin-bottom: 0.9rem;
+    }
+    .sec-desc {
+      color: var(--slate);
+      font-size: 0.97rem;
+      max-width: 580px;
+      margin-bottom: 3rem;
+      line-height: 1.7;
+    }
+
+    /* ── ABOUT ── */
+    #about { background: var(--white); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .about-text p {
+      color: #475569;
+      margin-bottom: 1rem;
+      font-size: 0.97rem;
+      line-height: 1.82;
+    }
+    .about-text p:last-child { margin-bottom: 0; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem 1.5rem;
+    }
+    .stat-num {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: var(--slate);
+      margin-top: 0.3rem;
+    }
+
+    /* ── PROJECTS ── */
+    #projects { background: var(--bg); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.4rem;
+    }
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .card:hover {
+      box-shadow: 0 10px 36px rgba(0,0,0,0.08);
+      transform: translateY(-3px);
+    }
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .sport-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      padding: 0.28rem 0.65rem;
+      border-radius: 20px;
+    }
+    .tag-football   { background: #fef2f2; color: #dc2626; }
+    .tag-basketball { background: #fff7ed; color: #ea580c; }
+    .tag-baseball   { background: #f0fdf4; color: #16a34a; }
+    .tag-research   { background: #faf5ff; color: #7c3aed; }
+    .tag-engineering{ background: #f0f9ff; color: #0284c7; }
+
+    .gh-link { color: #cbd5e1; text-decoration: none; transition: color 0.15s; }
+    .gh-link:hover { color: var(--navy); }
+    .gh-link svg { width: 20px; height: 20px; display: block; }
+
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.01em;
+    }
+    .card p {
+      color: var(--slate);
+      font-size: 0.87rem;
+      line-height: 1.68;
+      flex: 1;
+      margin-bottom: 1.25rem;
+    }
+    .pills { display: flex; flex-wrap: wrap; gap: 0.38rem; }
+    .pill {
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 0.71rem;
+      font-weight: 600;
+      padding: 0.24rem 0.58rem;
+      border-radius: 6px;
+    }
+
+    /* ── SKILLS ── */
+    #skills { background: var(--white); }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 2rem;
+    }
+    .skill-group h4 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--slate);
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--blue);
+      display: inline-block;
+    }
+    .skill-group ul { list-style: none; }
+    .skill-group li {
+      font-size: 0.9rem;
+      color: var(--text);
+      padding: 0.32rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .skill-group li:last-child { border-bottom: none; }
+
+    /* ── CONTACT ── */
+    #contact {
+      background: var(--slate-bg);
+      text-align: center;
+    }
+    #contact .sec-title { color: var(--navy); }
+    #contact .sec-desc { color: #475569; margin: 0 auto 2.25rem; }
+    .contact-links { display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #cbd5e1;
+      padding: 1.4rem 2rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.8rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 750px) {
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr 1fr; }
+      nav ul { display: none; }
+      .hero { padding: 110px 1.5rem 70px; }
+    }
+    @media (max-width: 440px) {
+      .skills-grid { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Dave Zack</a>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Dave Zack</h1>
+  <div class="hero-title">Data Scientist &nbsp;·&nbsp; Sports Analytics Enthusiast</div>
+  <p class="hero-sub">
+    Building rigorous, data-driven tools for sports decision-making, from Bayesian forecasting and deep learning to interactive visualization.
+  </p>
+  <div class="hero-links">
+    <a href="#projects" class="btn btn-primary">View Projects</a>
+    <a href="https://github.com/dave-zack3" target="_blank" rel="noopener" class="btn btn-ghost">
+      <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+    <a href="https://www.linkedin.com/in/dave-zack/" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn</a>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="inner">
+    <div class="about-grid">
+      <div class="about-text">
+        <div class="sec-label">About</div>
+        <h2 class="sec-title">Background</h2>
+        <p>
+          I'm a data scientist with a background in defense and national security, where I built analytical models and tools in high-stakes, resource-constrained environments.
+        </p>
+        <p>
+          I hold a Master's in Data Science from UC Berkeley's MIDS program. My graduate work spanned machine learning, causal inference, data engineering, and interactive visualization, with a growing focus on sports.
+        </p>
+        <p>
+          Outside of work, I channel these methods into sports analytics, the domain I've always found most compelling: player evaluation, game strategy, and performance forecasting across football, basketball, baseball, hockey, and soccer.
+        </p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num">7</div>
+          <div class="stat-lbl">Portfolio projects</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">3</div>
+          <div class="stat-lbl">Sports covered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="font-size:1.3rem">UC Berkeley</div>
+          <div class="stat-lbl">MS, Data Science (MIDS)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">D.C.</div>
+          <div class="stat-lbl">Area based</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="inner">
+    <div class="sec-label">Work</div>
+    <h2 class="sec-title">Projects</h2>
+    <p class="sec-desc">A selection of data science projects spanning sports analytics, machine learning, and systems engineering.</p>
+    <div class="projects-grid">
+
+      <!-- QB EPA -->
+      <div class="card">
+        <div class="card-head">
+          <span class="sport-tag tag-football">Football</span>
+          <a href="https://github.com/dave-zack3/qb_epa_forecasting" target="_blank" rel="noopener" class="gh-link" title="View on GitHub">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
+        <h3>QB EPA Forecasting</h3>
+        <p>Hierarchical Bayesian model forecasting quarterback passing EPA using public nflverse data, extending the Raiders QB WAR framework. Features non-centered parameterization, partial pooling via player intercepts, and player-specific forecast variance estimated from year-over-year volatility history. Includes an XGBoost baseline with time-series cross-validation, a Gaussian Process aging curve learned from data, and Student-t likelihoods after confirming residual fat tails with excess kurtosis of 1.93.</p>
+        <div class="pills">
+          <span class="pill">Python</span>
+          <span class="pill">PyMC</span>
+          <span class="pill">XGBoost</span>
+          <span class="pill">Gaussian Process</span>
+          <span class="pill">nflverse</span>
+        </div>
+      </div>
+
+      <!-- NFL Spread -->
+      <div class="card">
+        <div class="card-head">
+          <span class="sport-tag tag-football">Football</span>
+          <a href="https://github.com/dave-zack3/nfl_bayesian_rate_model" target="_blank" rel="noopener" class="gh-link" title="View on GitHub">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
+        <h3>NFL Spread Forecasting</h3>
+        <p>Probabilistic model for forecasting NFL point spreads using dynamic hierarchical Bayesian inference. Team strength is modeled as a latent AR(1) process with explicit offseason discontinuities. Matches Vegas closing-line RMSE within 0.04 points while producing full posterior predictive distributions for calibrated probability statements.</p>
+        <div class="pills">
+          <span class="pill">Python</span>
+          <span class="pill">PyMC</span>
+          <span class="pill">ArviZ</span>
+          <span class="pill">Bayesian Inference</span>
+          <span class="pill">AR(1)</span>
+        </div>
+      </div>
+
+      <!-- NBA Score -->
+      <div class="card">
+        <div class="card-head">
+          <span class="sport-tag tag-basketball">Basketball</span>
+          <a href="https://github.com/dave-zack3/nba_score_prediction" target="_blank" rel="noopener" class="gh-link" title="View on GitHub">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
+        <h3>NBA Score Differential Prediction</h3>
+        <p>LSTM neural network forecasting NBA game point differentials using sequential team performance data. Captures momentum and fatigue over a game sequence, then benchmarked against a feed-forward network and linear regression baseline via cross-validation.</p>
+        <div class="pills">
+          <span class="pill">Python</span>
+          <span class="pill">TensorFlow</span>
+          <span class="pill">LSTM</span>
+          <span class="pill">scikit-learn</span>
+          <span class="pill">NumPy</span>
+        </div>
+      </div>
+
+      <!-- NBA Shots Viz -->
+      <div class="card">
+        <div class="card-head">
+          <span class="sport-tag tag-basketball">Basketball</span>
+          <a href="https://github.com/dave-zack3/nba_shots_visualization" target="_blank" rel="noopener" class="gh-link" title="View on GitHub">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
+        <h3>NBA Shots Through the Years</h3>
+        <p>Interactive visualization exploring how NBA shooting evolved from 2000 to 2022. Users can filter by team and player to trace the three-point revolution, the mid-range decline, and paint efficiency trends, animated across two decades.</p>
+        <div class="pills">
+          <span class="pill">Tableau</span>
+          <span class="pill">Altair</span>
+          <span class="pill">Python</span>
+          <span class="pill">HTML</span>
+          <span class="pill">Bootstrap</span>
+        </div>
+      </div>
+
+      <!-- MLB -->
+      <div class="card">
+        <div class="card-head">
+          <span class="sport-tag tag-baseball">Baseball</span>
+          <a href="https://github.com/dave-zack3/mlb_team_analysis" target="_blank" rel="noopener" class="gh-link" title="View on GitHub">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
+        <h3>What Makes a Good Baseball Team?</h3>
+        <p>Narrative-driven EDA identifying the statistical drivers of MLB team success. Compares run differential, OBP, ERA, and fielding metrics to surface which factors most predict winning, and how those drivers have shifted across seasons.</p>
+        <div class="pills">
+          <span class="pill">Python</span>
+          <span class="pill">Pandas</span>
+          <span class="pill">Seaborn</span>
+          <span class="pill">Matplotlib</span>
+          <span class="pill">Jupyter</span>
+        </div>
+      </div>
+
+      <!-- AI Detection -->
+      <div class="card">
+        <div class="card-head">
+          <span class="sport-tag tag-research">Research</span>
+          <a href="https://github.com/dave-zack3/ai_detection_experiment" target="_blank" rel="noopener" class="gh-link" title="View on GitHub">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
+        <h3>AI Text Detection Experiment</h3>
+        <p>Randomized controlled experiment testing whether priming affects a person's ability to distinguish AI-generated text from human writing. Designed with power analysis; results analyzed via logistic regression and hypothesis testing.</p>
+        <div class="pills">
+          <span class="pill">R</span>
+          <span class="pill">Logistic Regression</span>
+          <span class="pill">Experimental Design</span>
+          <span class="pill">Hypothesis Testing</span>
+        </div>
+      </div>
+
+      <!-- ML Pipeline -->
+      <div class="card">
+        <div class="card-head">
+          <span class="sport-tag tag-engineering">Engineering</span>
+          <a href="https://github.com/dave-zack3/ml_deployment_pipeline" target="_blank" rel="noopener" class="gh-link" title="View on GitHub">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
+        <h3>ML Deployment Pipeline</h3>
+        <p>End-to-end production ML deployment: model training and serialization, a FastAPI REST inference endpoint, Docker containerization, and Kubernetes orchestration. Demonstrates the full path from notebook to scalable, reproducible service.</p>
+        <div class="pills">
+          <span class="pill">Python</span>
+          <span class="pill">FastAPI</span>
+          <span class="pill">Docker</span>
+          <span class="pill">Kubernetes</span>
+          <span class="pill">scikit-learn</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="inner">
+    <div class="sec-label">Capabilities</div>
+    <h2 class="sec-title">Skills</h2>
+    <p class="sec-desc">Technical tools and methods across modeling, engineering, and analysis.</p>
+    <div class="skills-grid">
+      <div class="skill-group">
+        <h4>Languages</h4>
+        <ul>
+          <li>Python</li>
+          <li>R</li>
+          <li>SQL</li>
+          <li>Bash</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h4>Modeling</h4>
+        <ul>
+          <li>Bayesian Inference</li>
+          <li>PyMC</li>
+          <li>TensorFlow / Keras</li>
+          <li>scikit-learn</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h4>Analysis</h4>
+        <ul>
+          <li>Experimental Design</li>
+          <li>Causal Inference</li>
+          <li>Feature Engineering</li>
+          <li>Time Series</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h4>Data</h4>
+        <ul>
+          <li>Pandas / NumPy</li>
+          <li>SQL (feature pipelines)</li>
+          <li>Jupyter</li>
+          <li>Git</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h4>Visualization</h4>
+        <ul>
+          <li>Tableau</li>
+          <li>Altair</li>
+          <li>Seaborn / Matplotlib</li>
+          <li>HTML / Bootstrap</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h4>Engineering</h4>
+        <ul>
+          <li>Docker</li>
+          <li>Kubernetes</li>
+          <li>FastAPI</li>
+          <li>Linux / Shell</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="inner">
+    <div class="sec-label">Get in Touch</div>
+    <h2 class="sec-title">Let's Connect</h2>
+    <p class="sec-desc">Sports analytics is a passion project outside of my day job. Always happy to connect with others who share the interest.</p>
+    <div class="contact-links">
+      <a href="mailto:davidrzack@gmail.com" class="btn btn-primary">Email Me</a>
+      <a href="https://www.linkedin.com/in/dave-zack/" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn</a>
+      <a href="https://github.com/dave-zack3" target="_blank" rel="noopener" class="btn btn-ghost">GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Dave Zack &nbsp;·&nbsp; Data Scientist</p>
+</footer>
+
+</body>
+</html>
