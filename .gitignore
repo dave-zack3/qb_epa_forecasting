@@ -19,3 +19,4 @@ notebooks/.ipynb_checkpoints/
 # Editor
 .vscode/
 .idea/
+scripts/build_notebook.py
