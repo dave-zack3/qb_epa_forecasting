@@ -30,6 +30,16 @@ WHAT CHANGES vs model_bayesian.py
     4. Output files use suffix _t to avoid overwriting Normal results:
        bayesian_t_forecasts.csv, bayesian_t_convergence_summary.csv
 
+    5. compute_player_volatility() fixes (interval calibration):
+       - sigma_epa_att_player now uses delta_epa_per_att (rate) instead of
+         delta_epa (total EPA). The old approach applied total EPA volatility
+         (~47 EPA/yr) as noise on epa_per_att (~0.1-0.4 range), a unit
+         mismatch that inflated forecast intervals to IQR ~300 EPA.
+       - sigma_att_player now computed from starter-only seasons (>= MIN_STARTER_ATT
+         attempts in BOTH years of a delta pair). Backup/injury transitions
+         were driving sigma_att to 169 att/yr; starter-to-starter deltas give
+         a realistic estimate of true attempt volatility.
+
 All other structure (predictors, non-centered parameterization, player-specific
 volatility, MIN_ATT_FORECAST filter) is identical.
 
@@ -77,29 +87,53 @@ def load_data() -> pd.DataFrame:
     return df[df["att"] >= MIN_ATT].copy()
 
 
+MIN_STARTER_ATT = 300   # minimum attempts in BOTH seasons to count a delta_att observation
+
+
 def compute_player_volatility(df: pd.DataFrame) -> pd.DataFrame:
     def robust_std(x):
         vals = x.dropna()
         return vals.std() if len(vals) >= MIN_DELTA_OBS else np.nan
 
-    vol = (
+    # sigma_epa_att: use delta_epa_per_att (rate), not delta_epa (total)
+    # sigma_att: only count year-pairs where both seasons are starter-level (>= MIN_STARTER_ATT)
+    #   to prevent backup/injury seasons from inflating attempt volatility
+    starter = df[df["att"] >= MIN_STARTER_ATT].copy()
+    starter["delta_att_starter"] = starter.groupby("gsis_id")["att"].diff()
+
+    sigma_att_df = (
+        starter.groupby("gsis_id")["delta_att_starter"]
+        .apply(lambda x: robust_std(x))
+        .rename("sigma_att_player")
+        .reset_index()
+    )
+
+    sigma_epa_df = (
         df.groupby("gsis_id")
         .agg(
-            sigma_att_player     = ("delta_att", robust_std),
-            sigma_epa_att_player = ("delta_epa", robust_std),
-            n_seasons            = ("season",    "count"),
+            sigma_epa_att_player = ("delta_epa_per_att", robust_std),
+            n_seasons            = ("season",            "count"),
         )
         .reset_index()
     )
 
+    vol = sigma_epa_df.merge(sigma_att_df, on="gsis_id", how="left")
+
     pop_sigma_att     = vol["sigma_att_player"].median()
     pop_sigma_epa_att = vol["sigma_epa_att_player"].median()
+
+    print(f"  Pop median sigma_att:     {pop_sigma_att:.1f}")
+    print(f"  Pop median sigma_epa_att: {pop_sigma_epa_att:.4f}")
 
     vol["sigma_att_player"]     = vol["sigma_att_player"].fillna(pop_sigma_att)
     vol["sigma_epa_att_player"] = vol["sigma_epa_att_player"].fillna(pop_sigma_epa_att)
 
+    # Cap at 75th percentile of the cleaned distribution
     att_cap     = vol["sigma_att_player"].quantile(0.75)
     epa_att_cap = vol["sigma_epa_att_player"].quantile(0.75)
+
+    print(f"  Cap sigma_att:     {att_cap:.1f}  (p75 of starter-only deltas)")
+    print(f"  Cap sigma_epa_att: {epa_att_cap:.4f}  (p75 of delta_epa_per_att)")
 
     vol["sigma_att_player"]     = vol["sigma_att_player"].clip(lower=5.0,   upper=att_cap)
     vol["sigma_epa_att_player"] = vol["sigma_epa_att_player"].clip(lower=0.001, upper=epa_att_cap)

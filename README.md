@@ -1,48 +1,67 @@
-# QB EPA Forecasting
+# Football Player Forecasting
 
-A multi-model system for forecasting NFL quarterback passing EPA (Expected Points Added) using publicly available nflverse data. Developed by Dave Zack.
+A multi-model system for forecasting NFL player EPA (Expected Points Added) using publicly available nflverse data. Developed by Dave Zack.
+
+**[Interactive report →](https://dave-zack3.github.io/football_player_forecasting/)**
 
 ## Overview
 
-Three models of increasing sophistication are compared for forecasting 2024 and 2025 total passing EPA for active starters, with calibrated uncertainty estimates.
+Three models of increasing sophistication are compared for forecasting 2024 and 2025 player EPA for active starters, with calibrated uncertainty estimates.
 
 | Model | Approach | Uncertainty |
 |---|---|---|
 | XGBoost | Gradient-boosted trees with time-series CV | Point estimate |
-| Hierarchical Bayesian | Partial pooling, player-specific volatility, polynomial aging curve | Full posterior |
+| Hierarchical Bayesian | Partial pooling, player-specific volatility, Student-t likelihood | Full posterior |
 | Gaussian Process | Same as Bayes but with HSGP replacing polynomial age terms | Full posterior |
 
-Both probabilistic models use a **Student-t likelihood** with learned degrees of freedom (nu). Residual excess kurtosis of 1.93 in the data indicated fat tails rather than Normal behavior. Both models independently estimated nu near 3, confirming near-Cauchy tails. Switching from Normal to Student-t dropped sigma_obs from 33 to 24.
+Both probabilistic models use a **Student-t likelihood** with learned degrees of freedom (nu). Residual excess kurtosis in the QB data indicated fat tails; the model independently estimated nu near 3, confirming near-Cauchy behavior. Switching from Normal to Student-t dropped sigma_obs from 33 to 24 for QBs.
 
-## Data
+## Positions
 
-All data is fetched via `nfl_data_py` (nflverse). No proprietary data is used. The dataset covers 1999-2023 QB passing seasons with a minimum of 100 attempts.
+### QB — Passing EPA (1999–2023)
 
-Key predictors:
-- `epa_per_att` (r = 0.91 with EPA)
-- `dakota` (CPOE + EPA/play composite, r = 0.86)
-- `pacr` (Passing Air Conversion Ratio)
-- `log_att` (volume control)
-- Age and aging curve (polynomial in Bayes, GP in the GP model)
+Target: total passing EPA per season. Key predictors: `epa_per_att` (r=0.91), `dakota` (CPOE + EPA/play composite, r=0.86), `pacr`, `log_att`, aging curve (polynomial in Bayes, GP in GP model). Minimum 100 attempts.
+
+### RB — Rushing EPA (2016–2023)
+
+Two-stage forecast: model predicts `rushing_epa_per_att` (efficiency) using `ryoe_per_att` (Rush Yards Over Expected from NGS) as the primary signal, then multiplies by projected carries for total EPA. This structure is necessary because total EPA = epa_per_att × carries — a multiplicative relationship that a linear model cannot capture directly.
+
+Missing NGS data (pre-2016 or low-carry seasons) is imputed using each player's own mean RYOE across seasons where data exists, with a `has_ngs` flag indicating real vs imputed values. Minimum 75 carries for training, 150 carries for forecast eligibility.
+
+## 2024 Forecast Validation
+
+Models were trained on data through 2023 and validated against 2024 actuals.
+
+| Position | n | MAE | Bias | Correlation | 50% Coverage | 90% Coverage |
+|---|---|---|---|---|---|---|
+| QB (passing EPA) | 24 | 35.3 | +11.2 | 0.56 | 54% | 71% |
+| RB (rushing EPA) | 34 | 17.8 | -0.2 | 0.07 | 47% | 85% |
+
+**QB:** r=0.56 indicates useful ranking signal — the model correctly identified Lamar Jackson, Jared Goff, and Josh Allen among the top performers. The 50% interval is nearly perfectly calibrated at 54% coverage. The 90% interval covers 71% of actuals; the three largest misses (Jackson +120, Goff +99, Burrow +82) were all outlier seasons that exceeded any reasonable 2023-based projection. Two bugs were fixed after initial validation: `sigma_epa_att` was erroneously computed from total EPA deltas (~47 EPA/yr) rather than EPA/att deltas (~0.18), and `sigma_att` was inflated by backup/injury transitions; both are now filtered to starter-level seasons only (≥300 attempts in both years of a delta pair).
+
+**RB:** Near-zero bias (-0.2 EPA) and well-calibrated intervals (47% actual vs 50% expected at the 50% level) indicate the model is correctly centered. Low rank correlation (r=0.07) reflects genuine RB unpredictability: the two largest misses — Saquon Barkley (error: +57 EPA) and Derrick Henry (error: +50 EPA) — were both team-change stories where opportunity expanded dramatically in 2024. No public model can capture this without depth chart and contract data.
 
 ## Project Structure
 
 ```
-qb_epa_forecasting/
+football_player_forecasting/
 ├── data/
 │   ├── raw/              # nflverse pull outputs
-│   └── processed/        # cleaned season/game data, model outputs
-├── figures/              # all plots generated by the notebook
+│   └── processed/        # cleaned data, model outputs, validation CSVs
+├── docs/
+│   └── index.html        # self-contained interactive report (GitHub Pages)
+├── figures/              # plots generated by the QB notebook
 ├── notebooks/
 │   └── qb_epa_forecast.ipynb
 ├── scripts/
-│   ├── process_data.py           # data pipeline
-│   ├── model_xgboost.py          # XGBoost baseline
-│   ├── model_bayesian.py         # Hierarchical Bayes (Normal likelihood)
-│   ├── model_bayesian_studentt.py# Hierarchical Bayes (Student-t, primary)
-│   ├── model_gp.py               # Gaussian Process (Normal likelihood)
-│   ├── model_gp_studentt.py      # Gaussian Process (Student-t, primary)
-│   └── build_notebook.py         # generates the notebook programmatically
+│   ├── process_data.py              # QB data pipeline
+│   ├── process_data_rb.py           # RB data pipeline
+│   ├── model_xgboost.py             # QB XGBoost baseline
+│   ├── model_bayesian_studentt.py   # QB Hierarchical Bayes (Student-t, primary)
+│   ├── model_gp_studentt.py         # QB Gaussian Process (Student-t, primary)
+│   ├── model_rb_bayesian_studentt.py# RB Hierarchical Bayes (Student-t)
+│   ├── validate_forecasts.py        # 2024 validation for QB and RB
+│   └── build_html_report.py         # generates docs/index.html
 ├── .gitignore
 └── requirements.txt
 ```
@@ -63,25 +82,36 @@ brew install libomp
 
 ## Running the Models
 
-Run scripts in order:
+**QB pipeline** (run in order):
 
 ```bash
 python3 scripts/process_data.py
 python3 scripts/model_xgboost.py
-python3 scripts/model_bayesian.py
 python3 scripts/model_bayesian_studentt.py
-python3 scripts/model_gp.py
 python3 scripts/model_gp_studentt.py
-python3 scripts/build_notebook.py
 ```
 
-Then open `notebooks/qb_epa_forecast.ipynb` in Jupyter.
+Then open `notebooks/qb_epa_forecast.ipynb` in Jupyter. The Bayesian and GP models each take 15–30 minutes to sample (4 chains × 1,000 draws). Trace files (`.nc`) are excluded from the repo due to size.
 
-The Bayesian and GP models each take 15-30 minutes to sample (4 chains x 1,000 draws). Trace files (`.nc`) are excluded from the repo due to size.
+**RB pipeline:**
+
+```bash
+python3 scripts/process_data_rb.py
+python3 scripts/model_rb_bayesian_studentt.py
+```
+
+**Validation and report:**
+
+```bash
+python3 scripts/validate_forecasts.py    # generates QB and RB validation CSVs
+python3 scripts/build_html_report.py     # generates docs/index.html
+```
 
 ## Key Findings
 
 - XGBoost anchors heavily on recent seasons. Mahomes ranked 10th due to a below-average 2023 (51 EPA); the Bayesian model ranked him 1st after pooling across his full career.
-- Player-specific forecast variance: each QB's uncertainty interval is estimated from their own year-over-year volatility history rather than a single population sigma.
-- The GP learned a population career arc peaking around age 28, with a length scale of ~5.8 years. This produces meaningfully different forecasts for young ascending QBs vs aging veterans compared to the polynomial model.
-- The Student-t likelihood is the correct choice for this dataset. The Normal inflated sigma_obs to absorb outlier seasons the t-distribution handles natively.
+- Player-specific forecast variance: each player's uncertainty interval is estimated from their own year-over-year volatility history rather than a single population sigma.
+- The GP learned a population QB career arc peaking around age 28, with a length scale of ~5.8 years. This produces meaningfully different forecasts for young ascending QBs vs aging veterans compared to the polynomial model.
+- The Student-t likelihood is the correct choice for both positions. For QBs, the Normal inflated sigma_obs to absorb outlier seasons the t-distribution handles natively.
+- For RBs, modeling `rushing_epa_per_att` (efficiency) directly and multiplying by projected carries is necessary: a linear model predicting total EPA with log_carries as a predictor produces a negative volume coefficient because total EPA = epa_per_att × carries is a multiplicative relationship.
+- RB forecasting is fundamentally constrained by opportunity: the two largest 2024 misses (Barkley, Henry) were driven by team changes that public data cannot anticipate. This is a feature, not a bug — the model correctly represents the true uncertainty RBs carry.

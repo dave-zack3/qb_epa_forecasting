@@ -88,8 +88,9 @@ def clean_seasons(seasons: pd.DataFrame, meta: pd.DataFrame) -> pd.DataFrame:
         df[f"{col}_lag1"] = df.groupby("gsis_id")[col].shift(1)
 
     # Year-over-year deltas (used to estimate player-specific volatility)
-    df["delta_epa"] = df["epa"] - df["epa_lag1"]
-    df["delta_att"] = df["att"] - df["att_lag1"]
+    df["delta_epa"]         = df["epa"]         - df["epa_lag1"]
+    df["delta_att"]         = df["att"]          - df["att_lag1"]
+    df["delta_epa_per_att"] = df["epa_per_att"]  - df["epa_per_att_lag1"]
 
     # Filter to meaningful seasons
     df = df[df["att"] >= MIN_ATT].copy()
